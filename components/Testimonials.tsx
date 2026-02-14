@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Testimonial } from '../types';
 
 const reviews: Testimonial[] = [
@@ -54,8 +54,47 @@ const reviews: Testimonial[] = [
 ];
 
 const Testimonials: React.FC = () => {
+  const [startIndex, setStartIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(3);
+
+  // Update visible count based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setVisibleCount(1);
+      } else if (window.innerWidth < 1024) {
+        setVisibleCount(2);
+      } else {
+        setVisibleCount(3);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleNext = () => {
+    setStartIndex((prev) => (prev + 1) % reviews.length);
+  };
+
+  const handlePrev = () => {
+    setStartIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
+  };
+
+  // Logic to handle wrapping for the visible slice
+  const getVisibleReviews = () => {
+    const visible = [];
+    for (let i = 0; i < visibleCount; i++) {
+      visible.push(reviews[(startIndex + i) % reviews.length]);
+    }
+    return visible;
+  };
+
+  const visibleReviews = getVisibleReviews();
+
   return (
-    <section className="bg-primary/5 py-24 px-6">
+    <section className="bg-primary/5 py-24 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div className="text-left">
@@ -63,18 +102,29 @@ const Testimonials: React.FC = () => {
             <h3 className="text-3xl md:text-4xl font-black text-secondary leading-tight">What Our Neighbors Say</h3>
           </div>
           <div className="flex gap-2">
-            <button className="w-12 h-12 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm">
+            <button 
+              onClick={handlePrev}
+              className="w-12 h-12 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm active:scale-95"
+              aria-label="Previous review"
+            >
               <span className="material-symbols-outlined">chevron_left</span>
             </button>
-            <button className="w-12 h-12 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm">
+            <button 
+              onClick={handleNext}
+              className="w-12 h-12 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm active:scale-95"
+              aria-label="Next review"
+            >
               <span className="material-symbols-outlined">chevron_right</span>
             </button>
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {reviews.map((review) => (
-            <div key={review.id} className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {visibleReviews.map((review, index) => (
+            <div 
+              key={`${review.id}-${index}`} 
+              className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-all animate-in fade-in slide-in-from-right-4 duration-500"
+            >
               <div className="flex gap-1 text-yellow-400 mb-4">
                 {[...Array(review.rating)].map((_, i) => (
                   <span key={i} className="material-symbols-outlined text-sm material-symbols-fill">star</span>
@@ -92,6 +142,20 @@ const Testimonials: React.FC = () => {
                 </div>
               </div>
             </div>
+          ))}
+        </div>
+
+        {/* Indicator dots */}
+        <div className="flex justify-center gap-2 mt-12">
+          {reviews.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setStartIndex(i)}
+              className={`h-2 rounded-full transition-all ${
+                startIndex === i ? 'w-8 bg-primary' : 'w-2 bg-gray-300'
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
           ))}
         </div>
       </div>
