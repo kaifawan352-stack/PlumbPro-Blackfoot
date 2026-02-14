@@ -87,13 +87,6 @@ const About: React.FC = () => {
                 </div>
               </div>
             </div>
-            
-            <div className="pt-4">
-              <a href="tel:2085550123" className="inline-flex items-center gap-3 text-white bg-secondary px-8 py-4 rounded-lg font-bold hover:bg-black transition-all shadow-lg active:scale-95">
-                Meet the Team
-                <span className="material-symbols-outlined">groups</span>
-              </a>
-            </div>
           </div>
         </div>
       </div>
