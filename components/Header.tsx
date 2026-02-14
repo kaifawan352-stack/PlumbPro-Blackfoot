@@ -30,7 +30,9 @@ const Header: React.FC<HeaderProps> = ({ onLogoClick }) => {
             (208) 555-0123
           </a>
           <a 
-            href="#hero-form" 
+            href="https://forms.gle/hNTdqpHQ1ZvMzK856" 
+            target="_blank"
+            rel="noopener noreferrer"
             className="bg-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md active:scale-95"
           >
             Book Now
