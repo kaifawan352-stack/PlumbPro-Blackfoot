@@ -7,20 +7,29 @@ const About: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center gap-16">
           <div className="flex-1 relative">
-            <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl">
-              <img 
-                src="https://images.unsplash.com/photo-1581244276891-83393aed4307?auto=format&fit=crop&q=80&w=800" 
-                alt="Plumbing Team" 
-                className="w-full h-auto object-cover"
-              />
+            {/* Replaced image with a stylized plumbing team symbol */}
+            <div className="relative z-10 rounded-2xl bg-gradient-to-br from-primary to-blue-800 aspect-square max-w-[500px] flex items-center justify-center shadow-2xl overflow-hidden group">
+              {/* Decorative background elements */}
+              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+              <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+              
+              <div className="text-white flex flex-col items-center gap-4 transition-transform group-hover:scale-110 duration-500">
+                <span className="material-symbols-outlined text-[150px] md:text-[200px] drop-shadow-2xl">
+                  engineering
+                </span>
+                <span className="text-2xl font-black uppercase tracking-[0.2em] opacity-80">Our Team</span>
+              </div>
             </div>
+
+            {/* Decorative boxes behind the main symbol */}
             <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-primary/10 rounded-2xl -z-0"></div>
             <div className="absolute -top-6 -left-6 w-32 h-32 border-4 border-primary/20 rounded-2xl -z-0"></div>
             
-            <div className="absolute bottom-10 left-10 bg-white p-6 rounded-xl shadow-xl z-20 hidden md:block border border-gray-100">
+            {/* The 'verified' badge remains */}
+            <div className="absolute bottom-10 -right-4 bg-white p-6 rounded-xl shadow-2xl z-20 hidden md:block border border-gray-100">
               <div className="flex items-center gap-4">
-                <div className="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center">
-                  <span className="material-symbols-outlined">verified</span>
+                <div className="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center animate-pulse">
+                  <span className="material-symbols-outlined font-bold">verified</span>
                 </div>
                 <div>
                   <div className="text-xl font-black text-secondary">Licensed</div>
