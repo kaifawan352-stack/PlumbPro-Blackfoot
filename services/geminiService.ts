@@ -22,15 +22,9 @@ SERVICE KNOWLEDGE:
 Always be polite and community-focused. If a situation sounds dangerous or complex, urge them to call (208) 555-0123 immediately.`;
 
 export const getPlumbingAdvice = async (message: string, history: {role: 'user' | 'model', text: string}[]) => {
-  // Use the API key exclusively from process.env.API_KEY
-  const apiKey = process.env.API_KEY;
-  
-  if (!apiKey || apiKey === 'undefined' || apiKey === 'null') {
-    console.error("Gemini API Key is missing or invalid in the current environment.");
-    return "I am sorry, but the AI Assistant is currently unavailable. Please call us directly at (208) 555-0123 for immediate help.";
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
+  // Initialize the AI client directly using the environment variable.
+  // The availability of process.env.API_KEY is handled externally.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   /**
    * Gemini Multi-turn Requirements:
@@ -41,10 +35,10 @@ export const getPlumbingAdvice = async (message: string, history: {role: 'user' 
   let lastAddedRole: 'user' | 'model' | null = null;
 
   for (const msg of history) {
-    // 1. Skip if the first message is from the model (the initial greeting)
+    // Skip the initial greeting if it's from the model to satisfy the 'user first' requirement
     if (contents.length === 0 && msg.role === 'model') continue;
     
-    // 2. Ensure roles alternate
+    // Ensure we don't send consecutive messages with the same role
     if (msg.role !== lastAddedRole) {
       contents.push({
         role: msg.role,
@@ -54,7 +48,7 @@ export const getPlumbingAdvice = async (message: string, history: {role: 'user' 
     }
   }
 
-  // Add the new user message
+  // Add the current user query to the contents
   contents.push({
     role: 'user',
     parts: [{ text: message }]
@@ -72,21 +66,22 @@ export const getPlumbingAdvice = async (message: string, history: {role: 'user' 
       },
     });
 
-    // The .text property is a direct string getter in the SDK
+    // Extract the generated text from the response object
     const responseText = response.text;
     
     if (!responseText) {
-      throw new Error("API returned an empty response.");
+      throw new Error("The AI returned an empty response.");
     }
 
     return responseText;
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
+    console.error("Gemini API Invocation Error:", error);
     
-    if (error.message?.includes('401') || error.message?.includes('API_KEY_INVALID')) {
-      return "I'm having trouble authenticating. Please call our Blackfoot office at (208) 555-0123 for expert assistance.";
+    // Specific messaging for common error scenarios
+    if (error.message?.includes('401') || error.message?.includes('API_KEY')) {
+      return "I'm having a bit of trouble with my connection right now. Please call our Blackfoot office directly at (208) 555-0123 for immediate plumbing help.";
     }
     
-    return "I apologize, but I am experiencing a technical issue. For urgent plumbing help or to book a consultation, please call our local office at (208) 555-0123.";
+    return "I apologize, but I am experiencing a technical issue. For urgent plumbing assistance or to book a consultation, please call (208) 555-0123.";
   }
 };
