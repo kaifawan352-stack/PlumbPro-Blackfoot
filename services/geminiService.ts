@@ -25,8 +25,15 @@ export const getPlumbingAdvice = async (message: string, history: {role: 'user' 
   // Use the API key exclusively from process.env.API_KEY
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
+  // The Gemini API requires that the first message in the conversation history be from the 'user'.
+  // We filter the history to remove the initial greeting if it's from the 'model' role.
+  const filteredHistory = history.filter((msg, index) => {
+    if (index === 0 && msg.role === 'model') return false;
+    return true;
+  });
+
   // Format the history for the Gemini API
-  const chatHistory = history.map(h => ({
+  const chatHistory = filteredHistory.map(h => ({
     role: h.role === 'user' ? 'user' : 'model',
     parts: [{ text: h.text }]
   }));
@@ -34,6 +41,7 @@ export const getPlumbingAdvice = async (message: string, history: {role: 'user' 
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
+      // Combine filtered history with the current user message
       contents: [...chatHistory, { role: 'user', parts: [{ text: message }] }],
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
@@ -43,7 +51,7 @@ export const getPlumbingAdvice = async (message: string, history: {role: 'user' 
       },
     });
 
-    // Extract text directly from the response object
+    // Extract text directly from the response object as a property
     const text = response.text;
     return text || "I apologize, but I am having trouble connecting to the service. Please call us directly at (208) 555-0123 for immediate assistance.";
   } catch (error) {
