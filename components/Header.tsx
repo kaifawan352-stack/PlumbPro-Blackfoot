@@ -1,15 +1,15 @@
 
 import React from 'react';
 
-const Header: React.FC = () => {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+interface HeaderProps {
+  onLogoClick: () => void;
+}
 
+const Header: React.FC<HeaderProps> = ({ onLogoClick }) => {
   return (
     <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 md:px-10 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-        <button onClick={scrollToTop} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <button onClick={onLogoClick} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div className="text-primary flex items-center">
             <span className="material-symbols-outlined text-4xl">plumbing</span>
           </div>
@@ -29,7 +29,12 @@ const Header: React.FC = () => {
             <span className="material-symbols-outlined">call</span>
             (208) 555-0123
           </a>
-          
+          <a 
+            href="#hero-form" 
+            className="bg-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md active:scale-95"
+          >
+            Book Now
+          </a>
         </div>
       </div>
     </header>

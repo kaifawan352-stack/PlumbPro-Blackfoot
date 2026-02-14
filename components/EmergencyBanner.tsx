@@ -13,9 +13,14 @@ const EmergencyBanner: React.FC = () => {
           <a href="tel:2085550123" className="bg-white text-primary px-10 py-5 rounded-lg font-black text-xl hover:bg-gray-100 transition-all shadow-2xl hover:-translate-y-1 active:scale-95">
             Call (208) 555-0123
           </a>
-          <button className="bg-primary border-2 border-white text-white px-10 py-5 rounded-lg font-black text-xl hover:bg-white/10 transition-all active:scale-95">
+          <a 
+            href="https://forms.gle/hNTdqpHQ1ZvMzK856" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="bg-primary border-2 border-white text-white px-10 py-5 rounded-lg font-black text-xl hover:bg-white/10 transition-all active:scale-95 flex items-center justify-center"
+          >
             Book Online
-          </button>
+          </a>
         </div>
       </div>
     </section>

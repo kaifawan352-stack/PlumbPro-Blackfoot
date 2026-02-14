@@ -63,7 +63,12 @@ const Hero: React.FC = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <a href="#hero-form" className="bg-primary text-white h-14 px-8 rounded-lg font-bold text-lg flex items-center justify-center gap-2 hover:shadow-lg transition-all active:scale-95">
+            <a 
+              href="https://forms.gle/hNTdqpHQ1ZvMzK856" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-primary text-white h-14 px-8 rounded-lg font-bold text-lg flex items-center justify-center gap-2 hover:shadow-lg transition-all active:scale-95"
+            >
               <span className="material-symbols-outlined">calendar_today</span>
               Schedule Online
             </a>
