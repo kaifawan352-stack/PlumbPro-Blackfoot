@@ -3,10 +3,46 @@ import React, { useState } from 'react';
 
 const Hero: React.FC = () => {
   const [form, setForm] = useState({ name: '', phone: '', service: 'Drain Cleaning' });
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Ensure this URL is from your latest "New Deployment" in Google Apps Script
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbwfzyZjjuPV0qih8rHZ_32spwdv_BPdqCyz9sIs9SXcF8gLvqxHndafIQGesaNhtazM/exec';
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Request submitted for ${form.name}. We will contact you at ${form.phone} shortly!`);
+    setStatus('loading');
+
+    try {
+      if (scriptURL.includes('placeholder')) {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setStatus('success');
+        return;
+      }
+
+      // Using URLSearchParams ensures the request is a "simple request" 
+      // which bypasses CORS preflight checks when using mode: 'no-cors'
+      const params = new URLSearchParams();
+      params.append('name', form.name);
+      params.append('phone', form.phone);
+      params.append('service', form.service);
+
+      await fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors', // Essential for Google Apps Script Web Apps
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+      });
+
+      // With no-cors, we can't read the response body, but if fetch doesn't throw,
+      // the request was successfully dispatched to the server.
+      setStatus('success');
+      setForm({ name: '', phone: '', service: 'Drain Cleaning' });
+    } catch (error) {
+      console.error('Submission error:', error);
+      setStatus('error');
+    }
   };
 
   return (
@@ -50,51 +86,90 @@ const Hero: React.FC = () => {
         </div>
 
         {/* Lead Gen Form */}
-        <div className="flex-1 w-full max-w-md bg-white rounded-xl p-8 shadow-2xl hidden lg:block border border-gray-100">
-          <h3 className="text-2xl font-bold text-secondary mb-2">Get a Free Estimate</h3>
-          <p className="text-gray-500 mb-6">Enter your details and we'll call you back instantly.</p>
-          
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Full Name</label>
-              <input 
-                className="w-full border-gray-200 rounded-lg focus:ring-primary focus:border-primary px-4 py-3" 
-                placeholder="John Doe" 
-                type="text"
-                required
-                value={form.name}
-                onChange={(e) => setForm({...form, name: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Phone Number</label>
-              <input 
-                className="w-full border-gray-200 rounded-lg focus:ring-primary focus:border-primary px-4 py-3" 
-                placeholder="(208) 000-0000" 
-                type="tel"
-                required
-                value={form.phone}
-                onChange={(e) => setForm({...form, phone: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Service Type</label>
-              <select 
-                className="w-full border-gray-200 rounded-lg focus:ring-primary focus:border-primary px-4 py-3"
-                value={form.service}
-                onChange={(e) => setForm({...form, service: e.target.value})}
+        <div className="flex-1 w-full max-w-md bg-white rounded-xl p-8 shadow-2xl hidden lg:block border border-gray-100 min-h-[480px]">
+          {status === 'success' ? (
+            <div className="h-full flex flex-col items-center justify-center text-center py-12 animate-in zoom-in duration-500">
+              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-5xl font-bold">check_circle</span>
+              </div>
+              <h3 className="text-2xl font-black text-secondary mb-2">Request Received!</h3>
+              <p className="text-gray-500 max-w-[250px]">We have sent your details to our dispatch team. A plumber will call you within 5 minutes.</p>
+              <button 
+                onClick={() => setStatus('idle')}
+                className="mt-8 text-primary font-bold hover:underline"
               >
-                <option>Drain Cleaning</option>
-                <option>Water Heater Repair</option>
-                <option>Pipe Replacement</option>
-                <option>Sewer Line</option>
-                <option>Other</option>
-              </select>
+                Submit another request
+              </button>
             </div>
-            <button className="w-full bg-primary text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-md mt-2">
-              Submit Request
-            </button>
-          </form>
+          ) : (
+            <>
+              <h3 className="text-2xl font-bold text-secondary mb-2">Get a Free Estimate</h3>
+              <p className="text-gray-500 mb-6">Enter your details and we'll call you back instantly.</p>
+              
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Full Name</label>
+                  <input 
+                    className="w-full border-gray-200 rounded-lg focus:ring-primary focus:border-primary px-4 py-3" 
+                    placeholder="John Doe" 
+                    type="text"
+                    required
+                    disabled={status === 'loading'}
+                    value={form.name}
+                    onChange={(e) => setForm({...form, name: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Phone Number</label>
+                  <input 
+                    className="w-full border-gray-200 rounded-lg focus:ring-primary focus:border-primary px-4 py-3" 
+                    placeholder="(208) 000-0000" 
+                    type="tel"
+                    required
+                    disabled={status === 'loading'}
+                    value={form.phone}
+                    onChange={(e) => setForm({...form, phone: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Service Type</label>
+                  <select 
+                    className="w-full border-gray-200 rounded-lg focus:ring-primary focus:border-primary px-4 py-3"
+                    disabled={status === 'loading'}
+                    value={form.service}
+                    onChange={(e) => setForm({...form, service: e.target.value})}
+                  >
+                    <option>Drain Cleaning</option>
+                    <option>Water Heater Repair</option>
+                    <option>Pipe Replacement</option>
+                    <option>Sewer Line</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <button 
+                  disabled={status === 'loading'}
+                  className="w-full bg-primary text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-md mt-2 flex items-center justify-center gap-2 disabled:opacity-70"
+                >
+                  {status === 'loading' ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    'Submit Request'
+                  )}
+                </button>
+                {status === 'error' && (
+                  <p className="text-red-500 text-xs font-bold text-center mt-2">
+                    Something went wrong. Please call us directly!
+                  </p>
+                )}
+              </form>
+            </>
+          )}
         </div>
       </div>
     </section>
