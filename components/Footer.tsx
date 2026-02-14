@@ -84,7 +84,8 @@ const Footer: React.FC<FooterProps> = ({ onPrivacyClick }) => {
         <p>© 2024 PlumbPro Blackfoot. All rights reserved. Locally owned & operated.</p>
         <div className="flex gap-8">
           <a className="hover:text-white transition-colors" href="#">Terms of Service</a>
-          <a className="hover:text-white transition-colors" href="https://www.google.com/maps/place/All+American+Rooter/@43.2006315,-112.4075533,611m/data=!3m1!1e3!4m6!3m5!1s0x535511e652973f17:0x27c86a7abe27e98c!8m2!3d43.200638!4d-112.4050591!16s%2Fg%2F1jkwfhwpr?entry=ttu&g_ep=EgoyMDI2MDIxMS4wIKXMDSoASAFQAw%3D%3D">Sitemap</a>
+          <a className="hover:text-white transition-colors" href="https://www.google.com/maps/place/All+American+Rooter/@43.2006315,-112.4075533,611m/data=!3m1!1e3!4m6!3m5!1s0x535511e652973f17:0x27c86a7abe27e98c!8m2!3d43.200638!4d-112.4050591!16s%2Fg%2F1jkwfhwpr?entry=ttu&g_ep=EgoyMDI2MDIxMS4wIKXMDSoASAFQAw%3D%3D"target="_blank"
+            rel="noopener noreferrer">Sitemap</a>
         </div>
       </div>
     </footer>
