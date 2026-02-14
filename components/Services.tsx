@@ -45,8 +45,13 @@ const Services: React.FC = () => {
             <p className="text-gray-600 mb-8 leading-relaxed flex-grow">
               {service.description}
             </p>
-            <a href="#" className="text-primary font-bold flex items-center gap-2 group-hover:gap-4 transition-all">
-              Learn More 
+            <a 
+              href="https://forms.gle/hNTdqpHQ1ZvMzK856" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary font-bold flex items-center gap-2 group-hover:gap-4 transition-all"
+            >
+              Book Now 
               <span className="material-symbols-outlined text-sm font-bold">arrow_forward</span>
             </a>
           </div>
