@@ -28,9 +28,18 @@ const AiAssistant: React.FC = () => {
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setIsLoading(true);
 
-    const response = await getPlumbingAdvice(userMsg, messages);
-    setMessages(prev => [...prev, { role: 'model', text: response }]);
-    setIsLoading(false);
+    try {
+      const response = await getPlumbingAdvice(userMsg, messages);
+      setMessages(prev => [...prev, { role: 'model', text: response }]);
+    } catch (error) {
+      console.error("Chat UI Error:", error);
+      setMessages(prev => [...prev, { 
+        role: 'model', 
+        text: "I'm having trouble connecting to my service. Please try again or call (208) 555-0123 for immediate assistance." 
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

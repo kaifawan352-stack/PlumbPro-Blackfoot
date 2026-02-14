@@ -23,39 +23,70 @@ Always be polite and community-focused. If a situation sounds dangerous or compl
 
 export const getPlumbingAdvice = async (message: string, history: {role: 'user' | 'model', text: string}[]) => {
   // Use the API key exclusively from process.env.API_KEY
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = process.env.API_KEY;
   
-  // The Gemini API requires that the first message in the conversation history be from the 'user'.
-  // We filter the history to remove the initial greeting if it's from the 'model' role.
-  const filteredHistory = history.filter((msg, index) => {
-    if (index === 0 && msg.role === 'model') return false;
-    return true;
-  });
+  if (!apiKey || apiKey === 'undefined' || apiKey === 'null') {
+    console.error("Gemini API Key is missing or invalid in the current environment.");
+    return "I am sorry, but the AI Assistant is currently unavailable. Please call us directly at (208) 555-0123 for immediate help.";
+  }
 
-  // Format the history for the Gemini API
-  const chatHistory = filteredHistory.map(h => ({
-    role: h.role === 'user' ? 'user' : 'model',
-    parts: [{ text: h.text }]
-  }));
+  const ai = new GoogleGenAI({ apiKey });
+
+  /**
+   * Gemini Multi-turn Requirements:
+   * 1. History must start with a 'user' role.
+   * 2. Roles must strictly alternate (user, model, user, model...).
+   */
+  const contents: any[] = [];
+  let lastAddedRole: 'user' | 'model' | null = null;
+
+  for (const msg of history) {
+    // 1. Skip if the first message is from the model (the initial greeting)
+    if (contents.length === 0 && msg.role === 'model') continue;
+    
+    // 2. Ensure roles alternate
+    if (msg.role !== lastAddedRole) {
+      contents.push({
+        role: msg.role,
+        parts: [{ text: msg.text }]
+      });
+      lastAddedRole = msg.role;
+    }
+  }
+
+  // Add the new user message
+  contents.push({
+    role: 'user',
+    parts: [{ text: message }]
+  });
 
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      // Combine filtered history with the current user message
-      contents: [...chatHistory, { role: 'user', parts: [{ text: message }] }],
+      contents,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.4, // Lower temperature for more consistent professional formatting
+        temperature: 0.4,
         topP: 0.95,
         topK: 40,
       },
     });
 
-    // Extract text directly from the response object as a property
-    const text = response.text;
-    return text || "I apologize, but I am having trouble connecting to the service. Please call us directly at (208) 555-0123 for immediate assistance.";
-  } catch (error) {
+    // The .text property is a direct string getter in the SDK
+    const responseText = response.text;
+    
+    if (!responseText) {
+      throw new Error("API returned an empty response.");
+    }
+
+    return responseText;
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
-    return "I apologize, but I am experiencing a technical issue. For urgent plumbing help or to book a consultation, please call our Blackfoot office at (208) 555-0123.";
+    
+    if (error.message?.includes('401') || error.message?.includes('API_KEY_INVALID')) {
+      return "I'm having trouble authenticating. Please call our Blackfoot office at (208) 555-0123 for expert assistance.";
+    }
+    
+    return "I apologize, but I am experiencing a technical issue. For urgent plumbing help or to book a consultation, please call our local office at (208) 555-0123.";
   }
 };
