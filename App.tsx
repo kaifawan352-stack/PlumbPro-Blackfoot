@@ -10,15 +10,19 @@ import EmergencyBanner from './components/EmergencyBanner';
 import Footer from './components/Footer';
 import AiAssistant from './components/AiAssistant';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'home' | 'privacy'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'privacy' | 'terms'>('home');
 
   // Handle back button or hash changes
   useEffect(() => {
     const handleHashChange = () => {
       if (window.location.hash === '#privacy') {
         setCurrentView('privacy');
+        window.scrollTo(0, 0);
+      } else if (window.location.hash === '#terms') {
+        setCurrentView('terms');
         window.scrollTo(0, 0);
       } else {
         setCurrentView('home');
@@ -43,6 +47,12 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
   };
 
+  const navigateToTerms = () => {
+    window.location.hash = 'terms';
+    setCurrentView('terms');
+    window.scrollTo(0, 0);
+  };
+
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <Header onLogoClick={navigateToHome} />
@@ -57,12 +67,14 @@ const App: React.FC = () => {
             <Testimonials />
             <EmergencyBanner />
           </>
-        ) : (
+        ) : currentView === 'privacy' ? (
           <PrivacyPolicy onBack={navigateToHome} />
+        ) : (
+          <TermsOfService onBack={navigateToHome} />
         )}
       </main>
 
-      <Footer onPrivacyClick={navigateToPrivacy} />
+      <Footer onPrivacyClick={navigateToPrivacy} onTermsClick={navigateToTerms} />
       <AiAssistant />
       
       {/* Floating Call Button for Mobile */}
