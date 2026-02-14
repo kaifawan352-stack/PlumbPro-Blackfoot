@@ -5,38 +5,27 @@ const Hero: React.FC = () => {
   const [form, setForm] = useState({ name: '', phone: '', service: 'Drain Cleaning' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  // Ensure this URL is from your latest "New Deployment" in Google Apps Script
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbwfzyZjjuPV0qih8rHZ_32spwdv_BPdqCyz9sIs9SXcF8gLvqxHndafIQGesaNhtazM/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbw3OcBlH1cTSmSC4_uk7PSE868BvO-KoWD005bxJ7bQZl5nCRha6K2RSvimc-jftsrO/exec';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
 
     try {
-      if (scriptURL.includes('placeholder')) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setStatus('success');
-        return;
-      }
-
-      // Using URLSearchParams ensures the request is a "simple request" 
-      // which bypasses CORS preflight checks when using mode: 'no-cors'
-      const params = new URLSearchParams();
-      params.append('name', form.name);
-      params.append('phone', form.phone);
-      params.append('service', form.service);
+      const formData = new URLSearchParams();
+      formData.append('name', form.name);
+      formData.append('phone', form.phone);
+      formData.append('service', form.service);
 
       await fetch(scriptURL, {
         method: 'POST',
-        mode: 'no-cors', // Essential for Google Apps Script Web Apps
+        mode: 'no-cors',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: params.toString(),
+        body: formData.toString(),
       });
 
-      // With no-cors, we can't read the response body, but if fetch doesn't throw,
-      // the request was successfully dispatched to the server.
       setStatus('success');
       setForm({ name: '', phone: '', service: 'Drain Cleaning' });
     } catch (error) {
@@ -74,10 +63,10 @@ const Hero: React.FC = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <button className="bg-primary text-white h-14 px-8 rounded-lg font-bold text-lg flex items-center justify-center gap-2 hover:shadow-lg transition-all active:scale-95">
+            <a href="#hero-form" className="bg-primary text-white h-14 px-8 rounded-lg font-bold text-lg flex items-center justify-center gap-2 hover:shadow-lg transition-all active:scale-95">
               <span className="material-symbols-outlined">calendar_today</span>
               Schedule Online
-            </button>
+            </a>
             <a href="tel:2085550123" className="bg-white text-secondary h-14 px-8 rounded-lg font-bold text-lg flex items-center justify-center gap-2 hover:bg-gray-100 transition-all active:scale-95 shadow-lg">
               <span className="material-symbols-outlined">call</span>
               Call (208) 555-0123
@@ -86,14 +75,14 @@ const Hero: React.FC = () => {
         </div>
 
         {/* Lead Gen Form */}
-        <div className="flex-1 w-full max-w-md bg-white rounded-xl p-8 shadow-2xl hidden lg:block border border-gray-100 min-h-[480px]">
+        <div id="hero-form" className="flex-1 w-full max-w-md bg-white rounded-xl p-8 shadow-2xl hidden lg:block border border-gray-100 min-h-[480px] scroll-mt-24">
           {status === 'success' ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-12 animate-in zoom-in duration-500">
               <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
                 <span className="material-symbols-outlined text-5xl font-bold">check_circle</span>
               </div>
               <h3 className="text-2xl font-black text-secondary mb-2">Request Received!</h3>
-              <p className="text-gray-500 max-w-[250px]">We have sent your details to our dispatch team. A plumber will call you within 5 minutes.</p>
+              <p className="text-gray-500 max-w-[250px]">We have sent your details to our dispatch team. A plumber will call you soon.</p>
               <button 
                 onClick={() => setStatus('idle')}
                 className="mt-8 text-primary font-bold hover:underline"
@@ -164,7 +153,7 @@ const Hero: React.FC = () => {
                 </button>
                 {status === 'error' && (
                   <p className="text-red-500 text-xs font-bold text-center mt-2">
-                    Something went wrong. Please call us directly!
+                    Something went wrong. Please check your connection!
                   </p>
                 )}
               </form>

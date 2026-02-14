@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
             <li><a className="hover:text-primary transition-colors flex items-center gap-2" href="#">Home</a></li>
             <li><a className="hover:text-primary transition-colors flex items-center gap-2" href="#services">Our Services</a></li>
             <li><a className="hover:text-primary transition-colors flex items-center gap-2" href="#about">About the Company</a></li>
-            <li><a className="hover:text-primary transition-colors flex items-center gap-2" href="#">Emergency Dispatch</a></li>
+            <li><a className="hover:text-primary transition-colors flex items-center gap-2" href="#emergency">Emergency Dispatch</a></li>
             <li><a className="hover:text-primary transition-colors flex items-center gap-2" href="#">Privacy Policy</a></li>
           </ul>
         </div>
@@ -54,17 +54,17 @@ const Footer: React.FC = () => {
           </ul>
         </div>
 
-        <div id="about">
+        <div>
           <h4 className="text-lg font-bold mb-8 relative after:content-[''] after:block after:w-8 after:h-1 after:bg-primary after:mt-2">Our Location</h4>
           <p className="text-sm text-gray-400 mb-6">Visit our office or find our dispatch center near you.</p>
           <a 
             className="inline-flex items-center justify-center w-full bg-primary text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-lg active:scale-95 gap-3" 
-            href="https://www.google.com/maps/place/Blackfoot,+ID+83221/" 
+            href="https://www.google.com/maps/place/All+American+Rooter/@43.2006315,-112.4075533,611m/data=!3m1!1e3!4m6!3m5!1s0x535511e652973f17:0x27c86a7abe27e98c!8m2!3d43.200638!4d-112.4050591!16s%2Fg%2F1jkwfhwpr?entry=ttu&g_ep=EgoyMDI2MDIxMS4wIKXMDSoASAFQAw%3D%3D" 
             target="_blank"
             rel="noopener noreferrer"
           >
             <span className="material-symbols-outlined">directions</span>
-            Get Directions
+            Get Direction
           </a>
         </div>
       </div>

@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Stats from './components/Stats';
 import Services from './components/Services';
+import About from './components/About';
 import Testimonials from './components/Testimonials';
 import EmergencyBanner from './components/EmergencyBanner';
 import Footer from './components/Footer';
@@ -17,6 +18,7 @@ const App: React.FC = () => {
         <Hero />
         <Stats />
         <Services />
+        <About />
         <Testimonials />
         <EmergencyBanner />
       </main>
