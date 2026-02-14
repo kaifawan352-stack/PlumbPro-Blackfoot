@@ -26,6 +26,30 @@ const reviews: Testimonial[] = [
     content: '"They cleared a drain clog that three other companies couldn\'t fix. These guys are the real deal and very affordable."',
     rating: 5,
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDBATXrRbhFkamczWZPCtcJEx2e4Mwof5x0nzJo-mdXM0R5BdyNaCGkDe8RaMCeGWL_qadnYGDeGVLNTQf7Euk2xpKnmlYdweOF1n-E7YaRpumx1bI00jFTU6D97axKldW6kDl9cjgy56ChZTLO5qjCBvQmTFepxsF5vp4C88nKd61nPwfYbPfYd_Ox1VDBnYKSzSFxs6huoPSFg4pRnCF3fD-hwY5UwEs3icAySMdS2m-umS1JpD-nTrmQ51FbB1hwQjxCqChTFaV0'
+  },
+  {
+    id: '4',
+    name: 'David R.',
+    role: 'Local Business Owner',
+    content: '"Highly recommend for any commercial plumbing needs. They fixed our restaurant\'s main line during the lunch rush with minimal disruption. Professional and efficient."',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200'
+  },
+  {
+    id: '5',
+    name: 'Amanda P.',
+    role: 'Blackfoot Resident',
+    content: '"I called them for a small leak, and they actually found a major issue with my sump pump that would have flooded my basement during the next rain. They saved me thousands!"',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200'
+  },
+  {
+    id: '6',
+    name: 'Robert H.',
+    role: 'Retired Veteran',
+    content: '"The most honest plumbers I\'ve dealt with in Idaho. No upselling, just honest work and fair prices. They respect your home and leave everything cleaner than they found it."',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200'
   }
 ];
 
@@ -50,7 +74,7 @@ const Testimonials: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {reviews.map((review) => (
-            <div key={review.id} className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+            <div key={review.id} className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow">
               <div className="flex gap-1 text-yellow-400 mb-4">
                 {[...Array(review.rating)].map((_, i) => (
                   <span key={i} className="material-symbols-outlined text-sm material-symbols-fill">star</span>
@@ -59,7 +83,7 @@ const Testimonials: React.FC = () => {
               <p className="text-gray-600 italic mb-8 leading-relaxed flex-grow">{review.content}</p>
               <div className="flex items-center gap-4">
                 <div 
-                  className="w-12 h-12 rounded-full bg-gray-100 bg-cover bg-center border border-gray-100" 
+                  className="w-12 h-12 rounded-full bg-gray-100 bg-cover bg-center border border-gray-100 shrink-0" 
                   style={{ backgroundImage: `url('${review.image}')` }}
                 />
                 <div>
