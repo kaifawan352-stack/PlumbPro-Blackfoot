@@ -23,70 +23,60 @@ SERVICE KNOWLEDGE:
 Always be polite and community-focused. If a situation sounds dangerous or complex, urge them to call (208) 555-0123 immediately.`;
 
 export const getPlumbingAdvice = async (message: string, history: ChatMessage[]) => {
-  try {
-    // Ensure the API key exists and is not a placeholder string
-    const apiKey = process.env.API_KEY;
+  // Access the environment variable directly as required.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  /**
+   * Gemini Multi-turn Requirements:
+   * 1. History must start with a 'user' role.
+   * 2. Roles must strictly alternate (user, model, user, model...).
+   */
+  const contents: any[] = [];
+  let lastAddedRole: 'user' | 'model' | null = null;
+
+  for (const msg of history) {
+    // Ensure the conversation starts with the user role.
+    if (contents.length === 0 && msg.role === 'model') continue;
     
-    if (!apiKey || apiKey === 'undefined' || apiKey === 'null' || apiKey === '') {
-      console.warn("API Key is missing or invalid. Check your environment variables.");
-      return "I am currently in maintenance mode. For immediate plumbing assistance, please call us directly at (208) 555-0123.";
+    // Ensure roles strictly alternate.
+    if (msg.role !== lastAddedRole) {
+      contents.push({
+        role: msg.role,
+        parts: [{ text: msg.text }]
+      });
+      lastAddedRole = msg.role;
     }
+  }
 
-    const ai = new GoogleGenAI({ apiKey });
+  // Add the current user message.
+  contents.push({
+    role: 'user',
+    parts: [{ text: message }]
+  });
 
-    /**
-     * Gemini Chat Requirements:
-     * 1. History must start with a 'user' role.
-     * 2. Roles must strictly alternate.
-     */
-    const formattedHistory: any[] = [];
-    let lastRole: 'user' | 'model' | null = null;
-
-    for (const msg of history) {
-      // Skip initial model greeting as history must start with user
-      if (formattedHistory.length === 0 && msg.role === 'model') continue;
-      
-      // Filter out consecutive messages with same role
-      if (msg.role !== lastRole) {
-        formattedHistory.push({
-          role: msg.role,
-          parts: [{ text: msg.text }]
-        });
-        lastRole = msg.role;
-      }
-    }
-
-    // Initialize the dedicated chat interface
-    const chat = ai.chats.create({
-      model: 'gemini-3-flash-preview',
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         temperature: 0.4,
         topP: 0.95,
         topK: 40,
       },
-      history: formattedHistory
     });
 
-    // Request response for the latest message
-    const result = await chat.sendMessage({ message });
-    const responseText = result.text;
+    // Use the .text property to extract the response string.
+    const responseText = response.text;
     
     if (!responseText) {
-      throw new Error("Received empty response from the AI model.");
+      throw new Error("The AI returned an empty response.");
     }
 
     return responseText;
   } catch (error: any) {
-    console.error("Gemini API Invocation Error:", error);
-    
-    // Provide a helpful fallback for common error codes
-    const errorMsg = error?.message || "";
-    if (errorMsg.includes('401') || errorMsg.includes('API_KEY')) {
-      return "I'm having trouble with my connection right now. Please call our Blackfoot office at (208) 555-0123 for expert advice and service.";
-    }
-    
-    // Bubble up to UI component catch block
+    console.error("Gemini API Error:", error);
+    // Rethrow to allow the UI component to display its standard connection error message.
     throw error;
   }
 };

@@ -3,8 +3,8 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   define: {
-    // Fallback to empty string if environment variable is not set during build
-    'process.env.API_KEY': JSON.stringify(process.env.API_KEY || "")
+    // Inject the API_KEY from the environment into the client-side code.
+    'process.env.API_KEY': JSON.stringify(process.env.API_KEY)
   },
   build: {
     outDir: 'dist',
