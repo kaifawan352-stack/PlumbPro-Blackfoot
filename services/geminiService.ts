@@ -22,8 +22,8 @@ SERVICE KNOWLEDGE:
 Always be polite and community-focused. If a situation sounds dangerous or complex, urge them to call (208) 555-0123 immediately.`;
 
 export const getPlumbingAdvice = async (message: string, history: {role: 'user' | 'model', text: string}[]) => {
-  // Initialize the AI client directly using the environment variable.
-  // The availability of process.env.API_KEY is handled externally.
+  // Initialize the AI client using the standard environment variable key.
+  // The process.env.API_KEY is provided by the build environment (Vite define).
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   /**
@@ -48,7 +48,7 @@ export const getPlumbingAdvice = async (message: string, history: {role: 'user' 
     }
   }
 
-  // Add the current user query to the contents
+  // Add the current user query to the contents array
   contents.push({
     role: 'user',
     parts: [{ text: message }]
@@ -66,7 +66,7 @@ export const getPlumbingAdvice = async (message: string, history: {role: 'user' 
       },
     });
 
-    // Extract the generated text from the response object
+    // The .text property extracts the generated string directly.
     const responseText = response.text;
     
     if (!responseText) {
@@ -75,11 +75,11 @@ export const getPlumbingAdvice = async (message: string, history: {role: 'user' 
 
     return responseText;
   } catch (error: any) {
-    console.error("Gemini API Invocation Error:", error);
+    console.error("Gemini API Error:", error);
     
-    // Specific messaging for common error scenarios
+    // Check for authentication or key errors specifically
     if (error.message?.includes('401') || error.message?.includes('API_KEY')) {
-      return "I'm having a bit of trouble with my connection right now. Please call our Blackfoot office directly at (208) 555-0123 for immediate plumbing help.";
+      return "I am currently having trouble verifying my credentials. Please call our Blackfoot office at (208) 555-0123 for immediate assistance.";
     }
     
     return "I apologize, but I am experiencing a technical issue. For urgent plumbing assistance or to book a consultation, please call (208) 555-0123.";
