@@ -1,5 +1,6 @@
 
 import { GoogleGenAI } from "@google/genai";
+import { ChatMessage } from "../types";
 
 const SYSTEM_INSTRUCTION = `You are the PlumbPro Blackfoot AI Assistant. 
 You are a helpful, professional, and knowledgeable plumbing expert serving the Blackfoot, Idaho area. 
@@ -21,67 +22,71 @@ SERVICE KNOWLEDGE:
 
 Always be polite and community-focused. If a situation sounds dangerous or complex, urge them to call (208) 555-0123 immediately.`;
 
-export const getPlumbingAdvice = async (message: string, history: {role: 'user' | 'model', text: string}[]) => {
-  // Initialize the AI client using the standard environment variable key.
-  // The process.env.API_KEY is provided by the build environment (Vite define).
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-  /**
-   * Gemini Multi-turn Requirements:
-   * 1. History must start with a 'user' role.
-   * 2. Roles must strictly alternate (user, model, user, model...).
-   */
-  const contents: any[] = [];
-  let lastAddedRole: 'user' | 'model' | null = null;
-
-  for (const msg of history) {
-    // Skip the initial greeting if it's from the model to satisfy the 'user first' requirement
-    if (contents.length === 0 && msg.role === 'model') continue;
-    
-    // Ensure we don't send consecutive messages with the same role
-    if (msg.role !== lastAddedRole) {
-      contents.push({
-        role: msg.role,
-        parts: [{ text: msg.text }]
-      });
-      lastAddedRole = msg.role;
-    }
-  }
-
-  // Add the current user query to the contents array
-  contents.push({
-    role: 'user',
-    parts: [{ text: message }]
-  });
-
+export const getPlumbingAdvice = async (message: string, history: ChatMessage[]) => {
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents,
+    // Ensure the API key exists and is not a placeholder string
+    const apiKey = process.env.API_KEY;
+    
+    if (!apiKey || apiKey === 'undefined' || apiKey === 'null' || apiKey === '') {
+      console.warn("API Key is missing or invalid. Check your environment variables.");
+      return "I am currently in maintenance mode. For immediate plumbing assistance, please call us directly at (208) 555-0123.";
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+
+    /**
+     * Gemini Chat Requirements:
+     * 1. History must start with a 'user' role.
+     * 2. Roles must strictly alternate.
+     */
+    const formattedHistory: any[] = [];
+    let lastRole: 'user' | 'model' | null = null;
+
+    for (const msg of history) {
+      // Skip initial model greeting as history must start with user
+      if (formattedHistory.length === 0 && msg.role === 'model') continue;
+      
+      // Filter out consecutive messages with same role
+      if (msg.role !== lastRole) {
+        formattedHistory.push({
+          role: msg.role,
+          parts: [{ text: msg.text }]
+        });
+        lastRole = msg.role;
+      }
+    }
+
+    // Initialize the dedicated chat interface
+    const chat = ai.chats.create({
+      model: 'gemini-3-flash-preview',
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         temperature: 0.4,
         topP: 0.95,
         topK: 40,
       },
+      history: formattedHistory
     });
 
-    // The .text property extracts the generated string directly.
-    const responseText = response.text;
+    // Request response for the latest message
+    const result = await chat.sendMessage({ message });
+    const responseText = result.text;
     
     if (!responseText) {
-      throw new Error("The AI returned an empty response.");
+      throw new Error("Received empty response from the AI model.");
     }
 
     return responseText;
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
+    console.error("Gemini API Invocation Error:", error);
     
-    // Check for authentication or key errors specifically
-    if (error.message?.includes('401') || error.message?.includes('API_KEY')) {
-      return "I am currently having trouble verifying my credentials. Please call our Blackfoot office at (208) 555-0123 for immediate assistance.";
+    // Provide a helpful fallback for common error codes
+    const errorMsg = error?.message || "";
+    if (errorMsg.includes('401') || errorMsg.includes('API_KEY')) {
+      return "I'm having trouble with my connection right now. Please call our Blackfoot office at (208) 555-0123 for expert advice and service.";
     }
     
-    return "I apologize, but I am experiencing a technical issue. For urgent plumbing assistance or to book a consultation, please call (208) 555-0123.";
+    // Bubble up to UI component catch block
+    throw error;
   }
 };
